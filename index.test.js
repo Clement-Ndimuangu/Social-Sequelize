@@ -48,6 +48,7 @@ describe('Social Sequelzie Test', () => {
     })
 
     test('user can have only one profile', async()=>{
+        // await db.sync({ force: true });
         const newUser = await User.create(users[0])
         const newProfile = await Profile.create(profiles[0])
         await newUser.setProfile(newProfile)
@@ -59,11 +60,54 @@ describe('Social Sequelzie Test', () => {
 
 
     test('user has many post', async ()=>{
+        await db.sync({ force: true });
         const newUser = await User.create(users[0])
-        const bulkPost = await Post.findAll()
+        const post1 = await Post.create(posts[0])
+        const post2 = await Post.create(posts[1])
+        const post3 = await Post.create(posts[2])
 
-        await newUser.setPosts(bulkPost)
+        await newUser.addPost(post1)
+        await newUser.addPost(post2)
+        await newUser.addPost(post3)
+
+        const associatedPosts = await newUser.getPosts()
+        expect(associatedPosts.length).toBe(3)
         
+
     })
+
+    test('user has many likes', async ()=>{
+        await db.sync({ force: true });
+        const newUser = await User.create(users[0])
+        const like1 = await Like.create(likes[0])
+        const like2 = await Like.create(likes[1])
+        const like3 = await Like.create(likes[2])
+
+        await newUser.addLikes(like1)
+        await newUser.addLikes(like2)
+        await newUser.addLikes(like3)
+
+        const associatedLikes = await newUser.getLikes()
+        expect(associatedLikes.length).toBe(3)
+        
+
+    })
+    test('likes can have many users', async ()=>{
+        await db.sync({ force: true });
+        const newLike = await Like.create(likes[0])
+        const user1 = await User.create(users[1])
+        const user2 = await User.create(users[2])
+        const user3 = await User.create(users[0])
+
+        await newLike.addUser(user1)
+        await newLike.addUser(user2)
+        await newLike.addUser(user3)
+        const associatedUsers = await newLike.getUsers()
+        expect(associatedUsers.length).toBe(3)
+        
+
+    })
+
+    
 
 })
